@@ -1,0 +1,6 @@
+{
+  "name": "development",
+  "default_attributes": {
+    "module": "httpd"
+  }
+}

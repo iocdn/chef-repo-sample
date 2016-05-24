@@ -1,0 +1,11 @@
+{
+  "name": "node1",
+  "server": "10.128.0.6",
+  "chef_environment" : "development",
+  "run_list": [
+    "role[web]"
+  ],
+  "default_attributes": {
+    "module": "httpd2"
+  }
+}

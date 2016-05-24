@@ -1,0 +1,4 @@
+local-mode-cache
+log/*
+Berksfile.lock
+site-cookbooks/*

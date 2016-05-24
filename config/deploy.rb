@@ -8,7 +8,7 @@ CHEF_REPO = File.expand_path('..', File.dirname(__FILE__))
 # 環境情報
 STAGE = env.fetch(:stage)
 # ssh ユーザ
-SSH_USER = 'keiichi'
+SSH_USER = Etc.getlogin
 # Chef-Client Package Url
 CHEF_CLIENT_URL='https://packages.chef.io/stable/el/6/chef-12.10.24-1.el6.x86_64.rpm'
 

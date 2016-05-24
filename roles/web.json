@@ -1,0 +1,9 @@
+{
+  "name": "web",
+  "run_list": [
+    "recipe[iocdn.mysql]"
+  ],
+  "default_attributes": {
+    "module": "httpd3"
+  }
+}
