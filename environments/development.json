@@ -7,6 +7,9 @@
       "users": [
         {"db": "wordpress", "name": "user01", "pwd": "pass01"}
       ]
+    },
+    "iocdn.wordpress": { 
+      "db" : { "name" : "wordpress" , "user" :"user01" , "pwd" : "pass01" }
     }
   }
 }
