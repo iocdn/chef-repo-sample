@@ -1,7 +1,7 @@
 {
   "name": "web",
   "run_list": [
-    "recipe[iocdn.mysql]",
+    "recipe[iocdn.mysql::default]",
     "recipe[iocdn.wordpress]"
   ],
   "default_attributes": {

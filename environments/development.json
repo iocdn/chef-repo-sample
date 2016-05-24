@@ -2,6 +2,10 @@
   "name": "development",
   "default_attributes": {
     "module": "httpd",
+    "iocdn.repo" : [
+      {"name": "epel-release-6-8.noarch.rpm" ,"url": "http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm"},
+      {"name": "remi-release-6.rpm" ,"url": "http://rpms.famillecollet.com/enterprise/remi-release-6.rpm"}
+    ],
     "iocdn.mysql": {
       "databases": ["wordpress"],
       "users": [
@@ -9,7 +13,8 @@
       ]
     },
     "iocdn.wordpress": { 
-      "db" : { "name" : "wordpress" , "user" :"user01" , "pwd" : "pass01" }
+      "db" : { "name" : "wordpress" , "user" :"user01" , "pwd" : "pass01" },
+      "url": "https://ja.wordpress.org/wordpress-4.5.2-ja.tar.gz"
     }
   }
 }

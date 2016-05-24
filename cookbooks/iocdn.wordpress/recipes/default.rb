@@ -7,24 +7,15 @@
 # All rights reserved - Do Not Redistribute
 #
 
-bash "download epel" do
-  code "wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm -O /tmp/epel-release-6-8.noarch.rpm"
-  not_if { File.exists?("/tmp/epel-release-6-8.noarch.rpm") }
-end
-
-bash "download epel" do
-  code "wget http://rpms.famillecollet.com/enterprise/remi-release-6.rpm -O /tmp/remi-release-6.rpm"
-  not_if { File.exists?("/tmp/remi-release-6.rpm") }
-end
-
-yum_package 'epel-release-6-8' do
-  action :install
-  source "/tmp/epel-release-6-8.noarch.rpm"
-end
-
-yum_package 'remi-release-6' do
-  action :install
-  source "/tmp/remi-release-6.rpm"
+node["iocdn.repo"].each do |repo|
+  bash "download #{repo["name"]}" do
+    code "wget #{repo["url"]} -O /tmp/#{repo["name"]}"
+    not_if { File.exists?("/tmp/#{repo["name"]}") }
+  end
+  yum_package "#{repo["name"].gsub(/\.rpm$/,'')}" do
+    action :install
+    source "/tmp/#{repo["name"]}"
+  end
 end
 
 %w(php php-mbstring php-mysql).each do |pkg|
@@ -43,15 +34,20 @@ bash "initialize php.ini" do
   EOS
 end
 
+wordpress_url  = node["iocdn.wordpress"]["url"]
+wordpress_name = File.basename(wordpress_url)
+
 bash "download wordpress" do
- code "wget https://ja.wordpress.org/wordpress-4.5.2-ja.tar.gz -O /tmp/wordpress-4.5.2-ja.tar.gz"
- not_if { File.exists?("/tmp/wordpress-4.5.2-ja.tar.gz") }
+  code "wget #{wordpress_url} -O /tmp/#{wordpress_name}"
+  not_if { File.exists?("/tmp/#{wordpress_name}")}
+# code "wget https://ja.wordpress.org/wordpress-4.5.2-ja.tar.gz -O /tmp/wordpress-4.5.2-ja.tar.gz"
+# not_if { File.exists?("/tmp/wordpress-4.5.2-ja.tar.gz") }
 end
 
 bash "expand wordpress" do
-  code <<-EOS
+  code <<-"EOS"
     cd /var/www/html 
-    tar -zxvf /tmp/wordpress-4.5.2-ja.tar.gz
+    tar -zxf /tmp/#{wordpress_name}
   EOS
 end
 
