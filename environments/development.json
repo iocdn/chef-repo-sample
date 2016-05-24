@@ -1,6 +1,13 @@
 {
   "name": "development",
   "default_attributes": {
-    "module": "httpd"
+    "module": "httpd",
+    "iocdn.mysql": {
+      "databases": ["wordpress"],
+      "users": [
+        {"db": "wordpress", "name": "user01", "pwd": "pass01"}
+      ]
+    }
   }
 }
+

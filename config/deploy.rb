@@ -3,15 +3,24 @@ lock '3.5.0'
 require 'capistrano/console'
 require 'json'
 
+# show: http://capistranorb.com/documentation/advanced-features/properties/
+## sshでログインするユーザ
+# set :user, "XXXXX"
+## ssh 設定
+# set :ssh_options, :port=>22, :forward_agent=>false, :keys=>"秘密鍵の場所", :passphrase => ""
+
 # chef-repoルートディレクトリ
 CHEF_REPO = File.expand_path('..', File.dirname(__FILE__))
 # 環境情報
 STAGE = env.fetch(:stage)
-# ssh ユーザ
-SSH_USER = Etc.getlogin
 # Chef-Client Package Url
-CHEF_CLIENT_URL='https://packages.chef.io/stable/el/6/chef-12.10.24-1.el6.x86_64.rpm'
+CHEF_CLIENT_URL = 'https://packages.chef.io/stable/el/6/chef-12.10.24-1.el6.x86_64.rpm'
+CHEF_CLIENT_VERSION = CHEF_CLIENT_URL.match(/chef-(?<version>\d+\.\d+).*$/)['version']
 
+# 既存のchef-repoを一旦削除してから展開
+FORCE = true
+
+SSH_USER = ENV['USER']
 
 # ログレベル
 set :log_level, :debug
@@ -22,7 +31,7 @@ set :application, 'chef'
 set :pty, true
 
 on roles(:all) do |host|
-  host.user = SSH_USER
+#  host.user = SSH_USER
 end
 
 # server情報の生成
@@ -40,6 +49,16 @@ end
 ########################################################################################
 
 ########################################
+# ruby の書式チェック
+task :ruby_c do
+  run_locally do
+    Dir.glob("#{CHEF_REPO}/**/**/*.rb").each do |_f|
+      system("sudo chef exec ruby -c #{_f} 1>/dev/null")
+    end
+  end
+end
+
+########################################
 # 環境別ノード情報の表示
 # chef exec cap development list_server
 ########################################
@@ -51,7 +70,7 @@ task :list_server do
 end
 
 ########################################
-# uptime
+#  uptime
 # chef exec cap deveopment uptime
 ########################################
 task :uptime do
@@ -79,64 +98,60 @@ end
 # chef exec cap development chef:all
 ########################################
 namespace :chef do
-  task :all  => ["chef:uptime1"] 
-  task :uptime1 do
+  task :all  => %w(install archive sync_archive run)
+ 
+  ########################################
+  # git pull
+  ########################################
+  task :git_pull do
+    run_locally do
+      system("git pull origin master")
+    end
+  end 
+  ########################################
+  # chef-clientのインストール
+  ########################################
+  task :install do
     on roles(:all), in: :parallel do |server|
-      uptime = capture(:uptime)
-      printf("%s(%s) %s\n", server.hostname, server.fetch(:name), uptime)
+      chef_v = capture("rpm -qa chef")
+      m = chef_v.match(/chef-(?<version>\d+\.\d+).*$/)
+      if m.nil?
+        printf("%s(%s)  install chef-client\n", server.hostname, server.fetch(:name))
+        execute("sudo yum -y install #{CHEF_CLIENT_URL}")
+      elsif m["version"].to_f < CHEF_CLIENT_VERSION.to_f
+        printf("%s(%s)  update chef-client %s to %s \n", server.hostname, server.fetch(:name), m["version"] , CHEF_CLIENT_VERSION)
+        execute("sudo yum -y update #{CHEF_CLIENT_URL}")
+      end
     end
   end
-  task :uptime2 do
+  ########################################
+  # chef-repoのアーカイブ
+  ########################################
+  task :archive do
+    run_locally do
+      execute("sudo tar -czf /tmp/chef-repo.tar.gz -C #{File.dirname(CHEF_REPO)} #{File.basename(CHEF_REPO)} --exclude log")
+    end
+  end
+  ########################################
+  # アーカイブファイルの転送
+  ########################################
+  task :sync_archive do
     on roles(:all), in: :parallel do |server|
-      uptime = capture(:uptime)
-      printf("%s(%s) %s\n", server.hostname, server.fetch(:name), uptime)
+      system("rsync -v  /tmp/chef-repo.tar.gz #{server.hostname}:/tmp/")
+      execute("sudo rm -rf /tmp/#{File.basename(CHEF_REPO)}") if FORCE
+      execute("tar -zxf /tmp/chef-repo.tar.gz -C /tmp")
+    end
+  end
+  ########################################
+  # 実行
+  ########################################
+  task :run do
+    on roles(:all), in: :parallel do |server|
+p File.basename(CHEF_REPO)
+     execute("cd /tmp/#{File.basename(CHEF_REPO)} && sudo chef-client -z -j nodes/#{STAGE}/#{server.fetch(:name)}.json")
     end
   end
 
-
 end
 
 
-task :ls do
-  on roles(:all), in: :parallel do |host|
-    system("git pull origin master")
-    #execute("hostname")
-    chef_v = capture("rpm -qa chef")
-    m = chef_v.match(/chef-(?<version>\d+\.\d+).*$/)
-    if m.nil?
-      execute("sudo yum -y install https://packages.chef.io/stable/el/6/chef-12.10.24-1.el6.x86_64.rpm")
-    elsif m["version"].to_f < 12.10
-      execute("sudo yum -y update https://packages.chef.io/stable/el/6/chef-12.10.24-1.el6.x86_64.rpm")
-    end
-    x = capture(:uptime)
-  end
-end
-
-# chef-repoをアーカイブ
-task :archive do
-  run_locally do
-    execute("sudo tar -czf /tmp/chef-repo.tar.gz -C #{File.dirname(CHEF_REPO)} #{File.basename(CHEF_REPO)} --exclude log")
-  end
-end
-
-task :sync do
-  on roles(:all), in: :parallel do |host|
-    system("rsync -v  /tmp/chef-repo.tar.gz #{host.hostname}:/tmp/")
-    execute("tar -zxf /tmp/chef-repo.tar.gz -C /tmp")
-  end
-end
-
-
-#nodes/development/node1.json
-# sudo chef-client -z -j nodes/development/node1.json -E development
-# sudo chef-client -z -j nodes/development/node1.json
-task :run do
-  on roles(:all), in: :parallel do |host|
-    execute("sudo chef-client -z N node1")
-  end
-end  
-
-# /var/tmp/chefに転送
-# chef zero 実行
-# rake lint
-# rake food

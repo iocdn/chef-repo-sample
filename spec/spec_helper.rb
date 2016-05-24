@@ -28,7 +28,6 @@ options[:user] ||= Etc.getlogin
 set :host,        options[:host_name] || host
 set :ssh_options, options
 
-# Set environment variables
-# set :env, :LANG => 'C', :LC_MESSAGES => 'C' 
+set :env, :LANG => 'C', :LC_MESSAGES => 'ja_jp.utf-8'
 
 set :request_pty, true
