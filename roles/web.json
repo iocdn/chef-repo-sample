@@ -2,7 +2,9 @@
   "name": "web",
   "run_list": [
     "recipe[iocdn.mysql::default]",
-    "recipe[iocdn.wordpress]"
+    "recipe[iocdn.wordpress]",
+    "recipe[iocdn.elasticsearch]",
+    "recipe[iocdn.td-agent]"
   ],
   "default_attributes": {
     "module": "httpd3"

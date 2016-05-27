@@ -8,10 +8,11 @@
 #
 
 node["iocdn.repo"].each do |repo|
-  bash "download #{repo["name"]}" do
-    code "wget #{repo["url"]} -O /tmp/#{repo["name"]}"
-    not_if { File.exists?("/tmp/#{repo["name"]}") }
+  remote_file "/tmp/#{repo["name"]}" do
+    source repo["url"]
+    action :create
   end
+
   yum_package "#{repo["name"].gsub(/\.rpm$/,'')}" do
     action :install
     source "/tmp/#{repo["name"]}"
@@ -37,11 +38,9 @@ end
 wordpress_url  = node["iocdn.wordpress"]["url"]
 wordpress_name = File.basename(wordpress_url)
 
-bash "download wordpress" do
-  code "wget #{wordpress_url} -O /tmp/#{wordpress_name}"
-  not_if { File.exists?("/tmp/#{wordpress_name}")}
-# code "wget https://ja.wordpress.org/wordpress-4.5.2-ja.tar.gz -O /tmp/wordpress-4.5.2-ja.tar.gz"
-# not_if { File.exists?("/tmp/wordpress-4.5.2-ja.tar.gz") }
+remote_file "/tmp/#{wordpress_name}" do
+  source wordpress_url
+  action :create
 end
 
 bash "expand wordpress" do
