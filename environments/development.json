@@ -15,6 +15,9 @@
     "iocdn.wordpress": { 
       "db" : { "name" : "wordpress" , "user" :"user01" , "pwd" : "pass01" },
       "url": "https://ja.wordpress.org/wordpress-4.5.2-ja.tar.gz"
+    },
+    "iocdn.kibana" : {
+      "package" : { "url" : "https://download.elastic.co/kibana/kibana/kibana-4.5.0-linux-x64.tar.gz" }
     }
   }
 }

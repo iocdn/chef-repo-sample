@@ -11,6 +11,9 @@ require 'json'
 
 # chef-repoルートディレクトリ
 CHEF_REPO = File.expand_path('..', File.dirname(__FILE__))
+# cookbookディレクトリ
+COOKBOOKS = %w(cookbooks site-cookbooks).map{|c| "#{CHEF_REPO}/#{c}" }
+
 # 環境情報
 STAGE = env.fetch(:stage)
 # Chef-Client Package Url
@@ -50,6 +53,7 @@ end
 
 ########################################
 # ruby の書式チェック
+########################################
 task :ruby_c do
   run_locally do
     Dir.glob("#{CHEF_REPO}/**/**/*.rb").each do |_f|
@@ -99,7 +103,7 @@ end
 ########################################
 namespace :chef do
   task :all  => %w(install archive sync_archive run)
- 
+
   ########################################
   # git pull
   ########################################
@@ -151,7 +155,7 @@ p File.basename(CHEF_REPO)
      execute("cd /tmp/#{File.basename(CHEF_REPO)} && sudo chef-client -z -j nodes/#{STAGE}/#{server.fetch(:name)}.json")
     end
   end
-
+  
 end
 
 

@@ -1,10 +1,12 @@
 {
   "name": "web",
   "run_list": [
+    "recipe[apache]",
     "recipe[iocdn.mysql::default]",
     "recipe[iocdn.wordpress]",
     "recipe[iocdn.elasticsearch]",
-    "recipe[iocdn.td-agent]"
+    "recipe[iocdn.td-agent]",
+    "recipe[iocdn.kibana]"
   ],
   "default_attributes": {
     "module": "httpd3"
