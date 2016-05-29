@@ -6,6 +6,9 @@
       {"name": "epel-release-6-8.noarch.rpm" ,"url": "http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm"},
       {"name": "remi-release-6.rpm" ,"url": "http://rpms.famillecollet.com/enterprise/remi-release-6.rpm"}
     ],
+    "iocdn.td-agent": {
+      "source": { "path" : "/var/log/httpd/access_log" }
+    },
     "iocdn.mysql": {
       "databases": ["wordpress"],
       "users": [

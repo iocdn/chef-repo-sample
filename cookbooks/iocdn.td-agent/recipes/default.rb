@@ -6,6 +6,7 @@
 #
 # All rights reserved - Do Not Redistribute
 #
+source_path = node["iocdn.td-agent"]["source"]["path"] 
 
 cookbook_file "/etc/yum.repos.d/td-agent.repo" do
   source "td-agent.repo"
@@ -23,8 +24,10 @@ bash "chkconfig td-agent on" do
   not_if "chkconfig --list |grep td-agent 2>&1 >/dev/null"
 end
 
-cookbook_file "/etc/td-agent/td-agent.conf" do
-  source "td-agent.conf"
+
+template "/etc/td-agent/td-agent.conf" do
+  source "td-agent.conf.erb"
+  variables({ "path" => source_path }) 
 end
 
 bash "install fluent-plugin-elasticsearch" do
@@ -41,7 +44,7 @@ bash "init td-agent" do
    mkdir -p /var/log/td-agent/position
    chown td-agent:td-agent /var/log/td-agent/position
    chmod 755 /var/log/td-agent/position
-   chmod -R  777 /var/log/httpd
+   chmod -R  777 #{File.dirname(source_path)}
   EOS
   not_if " [ -d /var/log/td-agent/position ] "
 end
