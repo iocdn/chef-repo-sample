@@ -1,3 +1,6 @@
+#
+# how to setup : chef exec gem install serverspec
+# how to use   : chef exec rake spec:all or chef exec rake spec:node1
 require 'rake'
 require 'pry'
 require 'rspec/core/rake_task'
