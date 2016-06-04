@@ -133,6 +133,7 @@ namespace :chef do
   ########################################
   task :archive do
     run_locally do
+      execute("sudo touch /tmp/client.rb")
       execute("sudo tar -czf /tmp/chef-repo.tar.gz -C #{File.dirname(CHEF_REPO)} #{File.basename(CHEF_REPO)} --exclude log")
     end
   end
@@ -152,7 +153,7 @@ namespace :chef do
   task :run do
     on roles(:all), in: :parallel do |server|
 p File.basename(CHEF_REPO)
-     execute("cd /tmp/#{File.basename(CHEF_REPO)} && sudo chef-client -z -j nodes/#{STAGE}/#{server.fetch(:name)}.json")
+     execute("cd /tmp/#{File.basename(CHEF_REPO)} && sudo chef-client -z -j nodes/#{STAGE}/#{server.fetch(:name)}.json" --config client.rb)
     end
   end
   
