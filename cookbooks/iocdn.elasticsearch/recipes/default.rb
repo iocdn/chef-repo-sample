@@ -18,7 +18,7 @@ yum_package "elasticsearch" do
   action :install
 end
 
-bash "chckconfig on elasticsearch" do
+bash "chkconfig on elasticsearch" do
   action :nothing
   code <<-EOS
     chkconfig elasticsearch on
