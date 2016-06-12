@@ -23,7 +23,7 @@ bash "chkconfig on elasticsearch" do
   code <<-EOS
     chkconfig elasticsearch on
   EOS
-  only_if "chkconfig --list |grep elasticsearch 2>&1 >/dev/null"
+  not_if "chkconfig --list |grep elasticsearch 2>&1 >/dev/null"
 end
 
 service "elasticsearch" do
