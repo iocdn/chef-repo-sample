@@ -37,6 +37,7 @@ namespace :spec do
     end
     RSpec::Core::RakeTask.new(node.to_sym) do |t|
       ENV['TARGET_HOST'] = target_host
+      t.rspec_opts = ['--format documentation']
       t.pattern = "#{BASEDIR}/spec/{#{patterns.join(',')}}"
       #t.pattern = "#{BASEDIR}/spec/environment/#{ENVIRONMENT}/#{node}_spec.rb"
     end
