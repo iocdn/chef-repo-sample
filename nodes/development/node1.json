@@ -1,6 +1,6 @@
 {
   "name": "node1",
-  "server": "10.128.0.6",
+  "server": "10.142.0.3",
   "chef_environment" : "development",
   "run_list": [
     "role[web]"

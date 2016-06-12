@@ -153,7 +153,7 @@ namespace :chef do
   task :run do
     on roles(:all), in: :parallel do |server|
 p File.basename(CHEF_REPO)
-     execute("cd /tmp/#{File.basename(CHEF_REPO)} && sudo chef-client -z -j nodes/#{STAGE}/#{server.fetch(:name)}.json" --config client.rb)
+     execute("cd /tmp/#{File.basename(CHEF_REPO)} && sudo chef-client -z -j nodes/#{STAGE}/#{server.fetch(:name)}.json --config client.rb")
     end
   end
   
